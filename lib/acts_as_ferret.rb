@@ -426,6 +426,16 @@ module ActsAsFerret
     end
     return conditions
   end
+  
+  # The string for the select that represents the primary key of this model.
+  def self.primary_key_string(model)
+    # if it has a comma, it's a composite primary key
+    if model.primary_key.to_s.include? ?,
+      return model.primary_key.to_s.split(',').map {|key| "#{model.table_name}.#{key}"}.join(' || "," || ')
+    else
+      return "#{model.table_name}.#{model.primary_key}"
+    end
+  end
 
   # retrieves search result records from a data structure like this:
   # { 'Model1' => { '1' => [ rank, score ], '2' => [ rank, score ] }
@@ -454,7 +464,7 @@ module ActsAsFerret
 
       # merge conditions
       conditions = conditions_for_model model_class, find_options[:conditions]
-      conditions = combine_conditions([ "#{model_class.table_name}.#{model_class.primary_key} in (?)", 
+      conditions = combine_conditions([ "#{primary_key_string(model_class)} in (?)", 
                                         id_array.keys ], 
                                       conditions)
 

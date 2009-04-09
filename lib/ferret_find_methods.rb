@@ -91,7 +91,7 @@ module ActsAsFerret
       rank = 0
       total_hits = find_ids(q, options) do |model, id, score, data|
         id_arrays[model] ||= {}
-        id_arrays[model][id] = [ rank += 1, score ]
+        id_arrays[model][id.to_a.join(',')] = [ rank += 1, score ]
       end
       [total_hits, id_arrays]
     end

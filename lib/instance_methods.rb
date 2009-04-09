@@ -118,7 +118,9 @@ module ActsAsFerret #:nodoc:
     end
     
     def ferret_key
-      "#{self.class.name}-#{self.send self.class.primary_key}" unless new_record?
+      # is it a composite primary key?
+      pk_value = self.class.primary_key.respond_to?(:map) ? self.class.primary_key.map {|pk| self.send(pk).to_s}.join : self.send(self.class.primary_key)
+      "#{self.class.name}-#{pk_value}" unless new_record?
     end
     
     # turn this instance into a ferret document (which basically is a hash of
